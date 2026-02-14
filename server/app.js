@@ -1,7 +1,11 @@
-const express = require("express");
-const cors = require("cors"); // ✅ import cors
-require("dotenv").config(); // ✅ Load environment variables
-const uploadRoutes = require("./routes/uploadRoutes");
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+import uploadRoutes from "./routes/uploadRoutes.js";
+
+dotenv.config();
 
 const app = express();
 
@@ -13,6 +17,7 @@ app.use(cors({
 // Use routes
 app.use("/api/uploads", uploadRoutes);
 
-app.listen(5000, () => {
-  console.log("Server started on port 5000");
+const PORT = 5000;
+app.listen(PORT, () => {
+  console.log(`✅ Server started on port ${PORT}`);
 });

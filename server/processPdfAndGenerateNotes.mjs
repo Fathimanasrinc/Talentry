@@ -6,7 +6,7 @@ import { PDFDocument, rgb } from "pdf-lib";
 // --- Improved Text Sanitization ---
 function sanitizeText(text) {
   return String(text)
-    .replace(/[•◦▪︎●○]/g, "") // Remove bullet symbols to force paragraph flow
+    .replace(/[•◦▪︎●○]/g, "") 
     .replace(/[""'']/g, '"')
     .replace(/[—–]/g, "-")
     .replace(/[\u0080-\uffff]/g, "")
@@ -14,30 +14,32 @@ function sanitizeText(text) {
     .trim();
 }
 
-// --- HUMAN LOGIC: Keyword Definitions ---
-const LOGIC_CONFIG = {
-  easy: ["definition", "basic", "what", "who", "summary", "simple", "overview", "main", "start", "introduction", "fact", "example"],
-  medium: ["how", "why", "process", "function", "connect", "between", "result", "method", "application", "interaction", "develop", "system"],
-  hard: ["theory", "critique", "advanced", "implication", "analysis", "nuance", "complex", "theoretical", "evaluation", "framework", "consequence", "structure", "mechanism", "attribute", "significant"]
+// --- LOGIC ENGINE: Weighted Scoring ---
+const SCORING = {
+  easy: { words: ["is", "are", "defined", "basic", "simple", "who", "what", "fact", "example"], weight: 1 },
+  medium: { words: ["how", "process", "function", "connect", "result", "method", "application", "interaction", "system", "because"], weight: 3 },
+  hard: { words: ["theory", "critique", "advanced", "implication", "analysis", "framework", "mechanism", "structure", "significant", "hypothesis"], weight: 5 }
 };
 
 function sortTextByLogic(rawText) {
-  const sentences = rawText.split(/[.!?]+\s/);
+  // Regex to split by sentence without breaking on abbreviations like "e.g."
+  const sentences = rawText.match(/[^.!?]+[.!?]+/g) || [];
   const sorted = { easy: [], medium: [], hard: [] };
 
   sentences.forEach(sentence => {
-    const cleanSentence = sentence.toLowerCase().trim();
-    if (cleanSentence.length < 20) return; 
+    const clean = sentence.toLowerCase().trim();
+    if (clean.length < 25) return; 
 
-    const scores = {
-      easy: LOGIC_CONFIG.easy.filter(word => cleanSentence.includes(word)).length,
-      medium: LOGIC_CONFIG.medium.filter(word => cleanSentence.includes(word)).length,
-      hard: LOGIC_CONFIG.hard.filter(word => cleanSentence.includes(word)).length
-    };
+    let scoreHard = 0, scoreMedium = 0, scoreEasy = 0;
 
-    if (scores.hard > 0 || cleanSentence.length > 150) {
+    SCORING.hard.words.forEach(w => { if (clean.includes(w)) scoreHard += SCORING.hard.weight; });
+    SCORING.medium.words.forEach(w => { if (clean.includes(w)) scoreMedium += SCORING.medium.weight; });
+    SCORING.easy.words.forEach(w => { if (clean.includes(w)) scoreEasy += SCORING.easy.weight; });
+
+    // Logical Tiering
+    if (scoreHard >= 5 || clean.length > 200) {
       sorted.hard.push(sentence.trim());
-    } else if (scores.medium > 0 || scores.easy === 0) {
+    } else if (scoreMedium >= 3 || (scoreMedium > 0 && scoreEasy > 0)) {
       sorted.medium.push(sentence.trim());
     } else {
       sorted.easy.push(sentence.trim());
@@ -47,15 +49,15 @@ function sortTextByLogic(rawText) {
   const createParagraphs = (arr) => {
     let paragraphs = [];
     for (let i = 0; i < arr.length; i += 4) {
-      paragraphs.push(arr.slice(i, i + 4).join(". ") + ".");
+      paragraphs.push(arr.slice(i, i + 4).join(" "));
     }
     return paragraphs.join("\n\n");
   };
 
   return {
     easy: sorted.easy.length ? createParagraphs(sorted.easy) : "Foundational overview.",
-    medium: sorted.medium.length ? createParagraphs(sorted.medium) : "Detailed process analysis.",
-    hard: sorted.hard.length ? createParagraphs(sorted.hard) : "Advanced structural implications."
+    medium: sorted.medium.length ? createParagraphs(sorted.medium) : "Process analysis.",
+    hard: sorted.hard.length ? createParagraphs(sorted.hard) : "Theoretical framework."
   };
 }
 
@@ -67,25 +69,16 @@ async function generatePdfFromText(title, content) {
 
     let page = pdfDoc.addPage([612, 792]);
     const { width, height } = page.getSize();
-    
     const margin = 50;
-    const bulletMargin = 20; // Extra indent for the text after the bullet
+    const bulletMargin = 20;
     const fontSize = 10;
     const lineHeight = 14;
     let currentY = height - 90;
 
-    // --- Header ---
-    page.drawRectangle({
-      x: 0, y: height - 60, width, height: 60,
-      color: rgb(0.1, 0.2, 0.4) 
-    });
+    // Header
+    page.drawRectangle({ x: 0, y: height - 60, width, height: 60, color: rgb(0.15, 0.25, 0.45) });
+    page.drawText(title, { x: margin, y: height - 38, size: 14, font: fontBold, color: rgb(1, 1, 1) });
 
-    page.drawText(title, { 
-      x: margin, y: height - 38, size: 16, font: fontBold, color: rgb(1, 1, 1) 
-    });
-
-    // Split content by sentences or paragraphs to create points
-    // Using \n\n as defined in your sortTextByLogic function
     const points = content.split("\n\n").filter(p => p.trim() !== "");
 
     for (const point of points) {
@@ -95,50 +88,34 @@ async function generatePdfFromText(title, content) {
 
       for (const word of words) {
         const testLine = currentLine + word + " ";
-        // Text width limit depends on whether we are indented for a bullet
         const maxLineWidth = width - (margin * 2) - bulletMargin;
-        const textWidth = font.widthOfTextAtSize(testLine, fontSize);
-
-        if (textWidth > maxLineWidth) {
-          // Draw the line
-          const xPos = isFirstLineOfPoint ? margin + bulletMargin : margin + bulletMargin;
+        if (font.widthOfTextAtSize(testLine, fontSize) > maxLineWidth) {
           
-          if (isFirstLineOfPoint) {
-            page.drawText("•", { x: margin, y: currentY, size: fontSize, font: fontBold });
-          }
-
-          page.drawText(currentLine.trim(), { x: xPos, y: currentY, size: fontSize, font });
-          
-          currentY -= lineHeight;
-          currentLine = word + " ";
-          isFirstLineOfPoint = false;
-
-          // Page Overflow Check
-          if (currentY < margin + 40) {
+          if (currentY < margin + 20) {
             page = pdfDoc.addPage([612, 792]);
             currentY = height - margin;
           }
+
+          if (isFirstLineOfPoint) {
+            page.drawText("•", { x: margin, y: currentY, size: fontSize, font: fontBold });
+          }
+          page.drawText(currentLine.trim(), { x: margin + bulletMargin, y: currentY, size: fontSize, font });
+          
+          currentLine = word + " ";
+          currentY -= lineHeight;
+          isFirstLineOfPoint = false;
         } else {
           currentLine = testLine;
         }
       }
-
-      // Draw the last remaining line of the point
-      if (isFirstLineOfPoint) {
-         page.drawText("•", { x: margin, y: currentY, size: fontSize, font: fontBold });
-      }
+      // Final line of point
       page.drawText(currentLine.trim(), { x: margin + bulletMargin, y: currentY, size: fontSize, font });
-      
-      // Add extra spacing between bullet points
-      currentY -= (lineHeight * 1.5); 
+      currentY -= (lineHeight * 1.5);
     }
 
     return await pdfDoc.save(); 
   } catch (e) {
-    console.error("PDF Component Failure:", e.message);
-    const fallbackDoc = await PDFDocument.create();
-    fallbackDoc.addPage().drawText("Error generating document content.");
-    return await fallbackDoc.save();
+    return (await PDFDocument.create()).save();
   }
 }
 
@@ -152,27 +129,24 @@ export async function processPdfAndGenerateNotes(fileBuffer) {
 
     const pdfDoc = await loadingTask.promise;
     let rawText = "";
-    const pagesToRead = Math.min(pdfDoc.numPages, 15); 
     
-    for (let i = 1; i <= pagesToRead; i++) {
+    for (let i = 1; i <= Math.min(pdfDoc.numPages, 15); i++) {
       const page = await pdfDoc.getPage(i);
       const content = await page.getTextContent();
-      rawText += content.items.map(s => s.str).join(" ") + " ";
+      
+      // FIX: Added safe check for item.str to prevent "undefined" errors
+      rawText += content.items
+        .map(item => item.str || "") 
+        .join(" ") + " ";
     }
 
     const cleanText = sanitizeText(rawText);
-    const sortedNotes = sortTextByLogic(cleanText);
-
-    // --- CUMULATIVE LOGIC ---
-    // Medium = Easy + Medium
-    const combinedMedium = `${sortedNotes.easy}\n\n${sortedNotes.medium}`;
-    // Hard = Easy + Medium + Hard
-    const combinedHard = `${sortedNotes.easy}\n\n${sortedNotes.medium}\n\n${sortedNotes.hard}`;
+    const sorted = sortTextByLogic(cleanText);
 
     const [easy, medium, hard] = await Promise.all([
-      generatePdfFromText("CORE CONCEPTS & DEFINITIONS", sortedNotes.easy),
-      generatePdfFromText("PROCESS & APPLICATION (INCLUDES CORE)", combinedMedium),
-      generatePdfFromText("COMPLETE ADVANCED THEORETICAL FRAMEWORK", combinedHard)
+      generatePdfFromText("CORE CONCEPTS", sorted.easy),
+      generatePdfFromText("DETAILED PROCESSES", `${sorted.easy}\n\n${sorted.medium}`),
+      generatePdfFromText("FULL THEORETICAL ANALYSIS", `${sorted.easy}\n\n${sorted.medium}\n\n${sorted.hard}`)
     ]);
 
     const outputDir = path.join(process.cwd(), "processed_notes");
@@ -182,11 +156,11 @@ export async function processPdfAndGenerateNotes(fileBuffer) {
     fs.writeFileSync(path.join(outputDir, "medium.pdf"), medium);
     fs.writeFileSync(path.join(outputDir, "hard.pdf"), hard);
 
-    return {
-      easy: Buffer.from(easy).toString('base64'),
-      medium: Buffer.from(medium).toString('base64'),
-      hard: Buffer.from(hard).toString('base64'),
-      folderPath: outputDir 
+    return { 
+        easy: Buffer.from(easy).toString('base64'), 
+        medium: Buffer.from(medium).toString('base64'), 
+        hard: Buffer.from(hard).toString('base64'), 
+        folderPath: outputDir 
     };
   } catch (err) {
     console.error("❌ Processing Error:", err.message);

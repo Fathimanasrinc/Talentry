@@ -1,5 +1,6 @@
-const express = require("express");
-const multer = require("multer");
+import express from "express";
+import multer from "multer";
+import { processPdfAndGenerateNotes } from "../processPdfAndGenerateNotes.mjs";
 
 const router = express.Router();
 const storage = multer.memoryStorage();
@@ -8,9 +9,6 @@ const upload = multer({ storage });
 router.post("/", upload.single("file"), async (req, res) => {
   try {
     const fileBuffer = req.file.buffer;
-
-    // Dynamic import of ES module
-    const { processPdfAndGenerateNotes } = await import("../processPdfAndGenerateNotes.mjs");
 
     // Call AI + PDF processing function
     const notesPdfs = await processPdfAndGenerateNotes(fileBuffer);
@@ -23,9 +21,9 @@ router.post("/", upload.single("file"), async (req, res) => {
       hard: notesPdfs.hard.toString("base64"),
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Error processing PDF");
+    console.error("❌ Processing Error:", error.message);
+    res.status(500).send({ error: "Error processing PDF", details: error.message });
   }
 });
 
-module.exports = router;
+export default router;

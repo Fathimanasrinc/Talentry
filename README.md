@@ -2,27 +2,27 @@
   <img src="./img.png" alt="Project Banner" width="100%">
 </p>
 
-# [Project Name] 🎯
+# [Talentry] 🎯
 
 ## Basic Details
 
-### Team Name: [Name]
+### Team Name: [Shecode]
 
 ### Team Members
-- Member 1: [Name] - [College]
-- Member 2: [Name] - [College]
+- Member 1: [Fathima Nasrin c] - [EMEA College of arts and science]
+- Member 2: [Fidha Shirin p] - [EMEA College of arts and science]
 
 ### Hosted Project Link
 [mention your project hosted link here]
 
 ### Project Description
-[2-3 lines about what your project does]
+[we can uplaod their note pdf and sort it to easy , medium and high levels]
 
 ### The Problem statement
-[What problem are you solving?]
+[students are stressed about exam the day before the exam with wast syllabus ]
 
 ### The Solution
-[How are you solving it?]
+[in our site students can uplaod their note pdf and sort it to easy , medium and high levels]
 
 ---
 
@@ -31,13 +31,12 @@
 ### Technologies/Components Used
 
 **For Software:**
-- Languages used: [e.g., JavaScript, Python, Java]
-- Frameworks used: [e.g., React, Django, Spring Boot]
-- Libraries used: [e.g., axios, pandas, JUnit]
-- Tools used: [e.g., VS Code, Git, Docker]
+- Languages used: [ Javascript,]
+- Frameworks used: [ React]
+- Tools used: [VS Code, Git]
 
 **For Hardware:**
-- Main components: [List main components]
+- Main components: [UploadPdf,ResultDisplay]
 - Specifications: [Technical specifications]
 - Tools required: [List tools needed]
 
@@ -46,10 +45,7 @@
 ## Features
 
 List the key features of your project:
-- Feature 1: [Description]
-- Feature 2: [Description]
-- Feature 3: [Description]
-- Feature 4: [Description]
+- Feature 1: [sorting note]
 
 ---
 
@@ -70,7 +66,7 @@ List the key features of your project:
 ### For Hardware:
 
 #### Components Required
-[List all components needed with specifications]
+[UploadPdf,ResultDisplay]
 
 #### Circuit Setup
 [Explain how to set up the circuit]
@@ -83,14 +79,14 @@ List the key features of your project:
 
 #### Screenshots (Add at least 3)
 
-![Screenshot1](Add screenshot 1 here with proper name)
-*Add caption explaining what this shows*
+![Screenshot1](./images/Screenshot%20(229).png)
+*front page*
 
-![Screenshot2](Add screenshot 2 here with proper name)
-*Add caption explaining what this shows*
+![Screenshot2](./images/Screenshot%20(231).png)
+*uploading page*
 
-![Screenshot3](Add screenshot 3 here with proper name)
-*Add caption explaining what this shows*
+![Screenshot3](./images//Screenshot%20(232).png)
+*result page*
 
 #### Diagrams
 
