@@ -1,0 +1,109 @@
+.landing-container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  font-family: 'serif', 'Times New Roman', Times, serif;
+  overflow: hidden;
+}
+
+/* Header Styling */
+.landing-header {
+  background-color: #243b46; /* The dark slate blue */
+  padding: 15px 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #ffffff;
+}
+
+.landing-logo {
+  font-size: 2.5rem;
+  font-weight: 600;
+  letter-spacing: 4px;
+  margin: 0;
+}
+
+.plus-icon-header {
+  font-size: 3rem;
+  font-weight: 300;
+  cursor: pointer;
+}
+
+/* Hero Section Styling */
+.hero-section {
+  display: flex;
+  flex: 1;
+  background-color: #cadbd9; /* Muted teal background */
+}
+
+.hero-left {
+  flex: 1.2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 80px;
+  padding-right: 20px;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  line-height: 1.2;
+  color: #1a2a33;
+  margin-bottom: 40px;
+  font-weight: 700;
+}
+
+.cta-btn {
+  width: fit-content;
+  padding: 15px 40px;
+  background-color: #1a2a33;
+  color: white;
+  font-size: 2rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.2s ease;
+}
+
+.cta-btn:hover {
+  background-color: #243b46;
+  transform: translateY(-2px);
+}
+
+/* Illustration Styling */
+.hero-right {
+  flex: 1;
+  background-color: #fbe6d4; /* The light peach background for illustration */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.illustration-wrapper {
+  width: 80%;
+  height: auto;
+}
+
+.hero-image {
+  width: 100%;
+  height: auto;
+  mix-blend-mode: multiply; /* Helps blend illustration if it has a white background */
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 1024px) {
+  .hero-section {
+    flex-direction: column;
+  }
+  .hero-left {
+    padding: 40px;
+    text-align: center;
+    align-items: center;
+  }
+  .hero-title {
+    font-size: 2.5rem;
+  }
+}

@@ -1,0 +1,74 @@
+/* Full page container - Clean white background */
+.upload-container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Perfect horizontal center */
+  align-items: center;     /* Perfect vertical center */
+  background-color: #ffffff; 
+  font-family: 'serif', 'Times New Roman', Times, serif;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Wrapper to keep the box and button stacked and centered */
+.center-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px; /* Space between the box and the button */
+}
+
+.upload-box {
+  width: 500px;
+  height: 400px;
+  border: 3px dashed #7a9da8;
+  border-radius: 12px;
+  background-color: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  margin: 20px;
+  transition: background-color 0.2s ease;
+}
+
+.upload-box:hover {
+  background-color: #f8fbfc;
+}
+
+.plus {
+  font-size: 100px;
+  color: #7a9da8;
+  font-weight: 200;
+  display: block;
+  margin-bottom: 10px;
+  line-height: 1;
+}
+
+.upload-content p {
+  font-size: 2rem;
+  color: #8a8a8a;
+  margin: 0;
+  text-align: center;
+}
+
+.analyse-btn {
+  width: 500px; /* Matches the width of the upload box */
+  padding: 18px 0;
+  border: none;
+  border-radius: 4px;
+  background-color: #1a2a33; /* Dark Slate Blue */
+  color: #ffffff;
+  font-size: 2.2rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.analyse-btn:hover {
+  opacity: 0.9;
+  background-color: #243b46;
+}
