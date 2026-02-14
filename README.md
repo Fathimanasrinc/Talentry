@@ -13,7 +13,7 @@
 - Member 2: [Fidha Shirin p] - [EMEA College of arts and science]
 
 ### Hosted Project Link
-[mention your project hosted link here]
+[(https://talentry12.vercel.app/)]
 
 ### Project Description
 [we can uplaod their note pdf and sort it to easy , medium and high levels]
